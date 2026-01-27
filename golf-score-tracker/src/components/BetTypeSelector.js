@@ -22,7 +22,6 @@ const BetTypeSelector = ({ selectedType, onSelect, style }) => {
             onPress={() => onSelect(type)}
             activeOpacity={0.7}
           >
-            <Text style={styles.icon}>{config.icon}</Text>
             <View style={styles.optionContent}>
               <Text
                 style={[styles.optionName, isSelected && styles.optionNameSelected]}
@@ -52,18 +51,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.white,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 10,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: colors.cardBorder,
   },
   optionSelected: {
     borderColor: colors.primary,
     backgroundColor: colors.primary + '08',
-  },
-  icon: {
-    fontSize: 28,
-    marginRight: 12,
   },
   optionContent: {
     flex: 1,

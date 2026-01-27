@@ -73,12 +73,34 @@ const RoundSetupScreen = ({ navigation }) => {
   };
 
   const handleNext = () => {
-    if (selectedPlayers.length < 2) {
-      Alert.alert('Select Players', 'Please select at least 2 players');
+    if (selectedPlayers.length < 1) {
+      Alert.alert('Select Players', 'Please select at least 1 player');
       return;
     }
     if (!selectedCourse) {
       Alert.alert('Select Course', 'Please select a course');
+      return;
+    }
+
+    // Solo play: skip bet setup
+    if (selectedPlayers.length === 1) {
+      const hasHandicaps = selectedPlayers.some((p) => p.handicapIndex != null);
+      if (hasHandicaps) {
+        navigation.navigate('HandicapSetup', {
+          players: selectedPlayers,
+          course: selectedCourse,
+          teeBox: selectedTee,
+          bets: [],
+        });
+      } else {
+        navigation.navigate('LiveScorecard', {
+          players: selectedPlayers,
+          course: selectedCourse,
+          teeBox: selectedTee,
+          bets: [],
+          useNetScores: false,
+        });
+      }
       return;
     }
 
@@ -249,9 +271,9 @@ const RoundSetupScreen = ({ navigation }) => {
 
       <View style={styles.footer}>
         <Button
-          title="Continue to Bet Setup"
+          title={selectedPlayers.length <= 1 ? 'Start Solo Round' : 'Continue to Bet Setup'}
           onPress={handleNext}
-          disabled={selectedPlayers.length < 2 || !selectedCourse}
+          disabled={selectedPlayers.length < 1 || !selectedCourse}
         />
       </View>
     </View>

@@ -9,11 +9,13 @@ import {
   StyleSheet,
   Alert,
   Animated,
+  Modal,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { colors } from '../constants/colors';
 import { saveRound, generateId, getSettings, updatePlayerStats } from '../utils/storage';
 import { calculateLiveBank, calculateRoundMoney } from '../utils/betCalculators';
+import { SIDE_BET_TYPES, sideBetConfig } from '../constants/betTypes';
 import HoleInfo from '../components/HoleInfo';
 import ScoreInput from '../components/ScoreInput';
 import MoneyBadge from '../components/MoneyBadge';
@@ -39,6 +41,14 @@ const LiveScorecardScreen = ({ navigation, route }) => {
   const [settings, setSettings] = useState({ soundEnabled: true, hapticsEnabled: true });
   const [moneyPop, setMoneyPop] = useState({ visible: false, amount: 0, positive: true });
   const [roundId] = useState(generateId());
+  const [showSideBets, setShowSideBets] = useState(false);
+  const [sideBetsPerHole, setSideBetsPerHole] = useState(() => {
+    const initial = {};
+    for (let i = 0; i < numHoles; i++) {
+      initial[i] = {};
+    }
+    return initial;
+  });
 
   const prevLiveBank = useRef({});
 
@@ -108,6 +118,37 @@ const LiveScorecardScreen = ({ navigation, route }) => {
     if (hole >= 1 && hole <= numHoles) {
       setCurrentHole(hole);
     }
+  };
+
+  const getApplicableSideBets = (holeIndex) => {
+    const hole = course?.holes?.[holeIndex];
+    const par = hole?.par || 4;
+    return Object.entries(sideBetConfig).filter(([, config]) => {
+      if (config.applicableHoles === 'all') return true;
+      if (config.applicableHoles === 'par3' && par === 3) return true;
+      if (config.applicableHoles === 'par4and5' && (par === 4 || par === 5)) return true;
+      return false;
+    });
+  };
+
+  const toggleSideBet = (holeIndex, betType) => {
+    setSideBetsPerHole((prev) => {
+      const holeData = { ...prev[holeIndex] };
+      if (holeData[betType]) {
+        delete holeData[betType];
+      } else {
+        holeData[betType] = { enabled: true, winner: null };
+      }
+      return { ...prev, [holeIndex]: holeData };
+    });
+  };
+
+  const setSideBetWinner = (holeIndex, betType, playerId) => {
+    setSideBetsPerHole((prev) => {
+      const holeData = { ...prev[holeIndex] };
+      holeData[betType] = { ...holeData[betType], winner: playerId };
+      return { ...prev, [holeIndex]: holeData };
+    });
   };
 
   const handleFinishRound = () => {
@@ -386,14 +427,97 @@ const LiveScorecardScreen = ({ navigation, route }) => {
               onPress={handleQuit}
               style={styles.quitButton}
             />
+            {players.length > 1 && (
+              <Button
+                title="Side Bets"
+                variant="outline"
+                onPress={() => setShowSideBets(true)}
+                style={styles.sideBetsButton}
+              />
+            )}
             <Button
-              title="Next Hole →"
+              title="Next Hole"
               onPress={() => goToHole(currentHole + 1)}
               style={styles.nextButton}
             />
           </View>
         )}
       </View>
+
+      {/* Side Bets Modal */}
+      <Modal
+        visible={showSideBets}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowSideBets(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Side Bets - Hole {currentHole}</Text>
+              <TouchableOpacity onPress={() => setShowSideBets(false)}>
+                <Text style={styles.modalClose}>Done</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalBody}>
+              {getApplicableSideBets(currentHole - 1).map(([type, config]) => {
+                const isActive = !!sideBetsPerHole[currentHole - 1]?.[type];
+                return (
+                  <View key={type} style={styles.sideBetItem}>
+                    <TouchableOpacity
+                      style={[
+                        styles.sideBetToggle,
+                        isActive && styles.sideBetToggleActive,
+                      ]}
+                      onPress={() => toggleSideBet(currentHole - 1, type)}
+                    >
+                      <View style={styles.sideBetInfo}>
+                        <Text style={styles.sideBetName}>{config.name}</Text>
+                        <Text style={styles.sideBetDesc}>{config.description}</Text>
+                      </View>
+                      <View style={[styles.sideBetCheck, isActive && styles.sideBetCheckActive]}>
+                        {isActive && <Text style={styles.sideBetCheckText}>On</Text>}
+                        {!isActive && <Text style={styles.sideBetCheckTextOff}>Off</Text>}
+                      </View>
+                    </TouchableOpacity>
+                    {isActive && (
+                      <View style={styles.sideBetWinners}>
+                        <Text style={styles.sideBetWinnerLabel}>Winner:</Text>
+                        {players.map((player) => (
+                          <TouchableOpacity
+                            key={player.id}
+                            style={[
+                              styles.sideBetWinnerOption,
+                              sideBetsPerHole[currentHole - 1]?.[type]?.winner === player.id &&
+                                styles.sideBetWinnerOptionActive,
+                            ]}
+                            onPress={() => setSideBetWinner(currentHole - 1, type, player.id)}
+                          >
+                            <Text
+                              style={[
+                                styles.sideBetWinnerText,
+                                sideBetsPerHole[currentHole - 1]?.[type]?.winner === player.id &&
+                                  styles.sideBetWinnerTextActive,
+                              ]}
+                            >
+                              {player.name.split(' ')[0]}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
+              {getApplicableSideBets(currentHole - 1).length === 0 && (
+                <Text style={styles.noSideBets}>
+                  No side bets available for this hole
+                </Text>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       {/* Money Pop Animation */}
       <MoneyPop
@@ -603,11 +727,134 @@ const styles = StyleSheet.create({
   nextButton: {
     flex: 2,
   },
+  sideBetsButton: {
+    flex: 1,
+  },
   moneyPop: {
     position: 'absolute',
     top: '40%',
     left: '50%',
     marginLeft: -50,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.cardBorder,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  modalClose: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  modalBody: {
+    padding: 16,
+  },
+  sideBetItem: {
+    marginBottom: 12,
+  },
+  sideBetToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  sideBetToggleActive: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primary + '08',
+  },
+  sideBetInfo: {
+    flex: 1,
+  },
+  sideBetName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  sideBetDesc: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  sideBetCheck: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: colors.cardBorder,
+  },
+  sideBetCheckActive: {
+    backgroundColor: colors.primary,
+  },
+  sideBetCheckText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.white,
+  },
+  sideBetCheckTextOff: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  sideBetWinners: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 10,
+    paddingHorizontal: 8,
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  sideBetWinnerLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    marginRight: 4,
+  },
+  sideBetWinnerOption: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  sideBetWinnerOptionActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  sideBetWinnerText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  sideBetWinnerTextActive: {
+    color: colors.white,
+  },
+  noSideBets: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: 24,
   },
 });
 

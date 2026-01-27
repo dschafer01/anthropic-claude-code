@@ -2,30 +2,30 @@
 
 export const colors = {
   // Primary colors
-  primary: '#10B981',
-  primaryDark: '#059669',
-  primaryLight: '#34D399',
+  primary: '#00C805',
+  primaryDark: '#00A004',
+  primaryLight: '#33D337',
 
   // Success/Money positive
-  success: '#059669',
-  moneyPositive: '#22C55E',
+  success: '#00C805',
+  moneyPositive: '#00C805',
 
   // Danger/Money negative
-  danger: '#EF4444',
-  dangerDark: '#DC2626',
-  moneyNegative: '#DC2626',
+  danger: '#FF5000',
+  dangerDark: '#E0300E',
+  moneyNegative: '#FF5000',
 
   // Neutrals
   white: '#FFFFFF',
-  background: '#FFFFFF',
-  card: '#F3F4F6',
-  cardBorder: '#E5E7EB',
-  text: '#111827',
-  textSecondary: '#6B7280',
-  textMuted: '#9CA3AF',
+  background: '#F8F9FA',
+  card: '#FFFFFF',
+  cardBorder: '#E8EAED',
+  text: '#1E2124',
+  textSecondary: '#7A7E83',
+  textMuted: '#B0B3B8',
 
   // Dark backgrounds
-  dark: '#1F2937',
+  dark: '#1E2124',
   darkCard: '#374151',
 
   // Tee colors

@@ -203,31 +203,26 @@ const ProfileScreen = ({ navigation }) => {
       <Text style={styles.sectionTitle}>Settings</Text>
       {[
         {
-          icon: '⚙️',
           title: 'App Settings',
           subtitle: 'Sound, haptics, theme',
           onPress: () => navigation.navigate('Settings'),
         },
         {
-          icon: '⛳️',
           title: 'Manage Courses',
           subtitle: `${stats?.totalRounds || 0} rounds played`,
           onPress: () => navigation.navigate('CourseManagement'),
         },
         {
-          icon: '👥',
           title: 'Manage Players',
           subtitle: 'Add or edit players',
           onPress: () => navigation.navigate('PlayerManagement'),
         },
         {
-          icon: '🏌️',
           title: 'GHIN Setup',
           subtitle: currentUser?.ghinNumber || 'Not connected',
           onPress: () => navigation.navigate('GHINSetup'),
         },
         {
-          icon: '📤',
           title: 'Export Data',
           subtitle: 'Backup your rounds and stats',
           onPress: handleExportData,
@@ -238,12 +233,11 @@ const ProfileScreen = ({ navigation }) => {
           style={styles.menuItem}
           onPress={item.onPress}
         >
-          <Text style={styles.menuIcon}>{item.icon}</Text>
           <View style={styles.menuInfo}>
             <Text style={styles.menuTitle}>{item.title}</Text>
             <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
           </View>
-          <Text style={styles.menuArrow}>›</Text>
+          <Text style={styles.menuArrow}>></Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -415,16 +409,12 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     marginBottom: 10,
     borderWidth: 1,
     borderColor: colors.cardBorder,
-  },
-  menuIcon: {
-    fontSize: 24,
-    marginRight: 14,
   },
   menuInfo: {
     flex: 1,

@@ -17,16 +17,24 @@ const Tab = createBottomTabNavigator();
 // Tab bar icons
 const TabIcon = ({ name, focused, color }) => {
   const icons = {
-    Home: focused ? '🏠' : '🏡',
-    NewRound: '➕',
-    Rivalries: focused ? '🔥' : '🔥',
-    History: focused ? '📋' : '📜',
-    Profile: focused ? '👤' : '👤',
+    Home: 'H',
+    NewRound: '+',
+    Rivalries: 'R',
+    History: 'C',
+    Profile: 'P',
   };
 
   return (
     <View style={styles.iconContainer}>
-      <Text style={[styles.icon, { opacity: focused ? 1 : 0.6 }]}>
+      <Text
+        style={[
+          styles.icon,
+          {
+            color: focused ? colors.primary : colors.textMuted,
+            fontWeight: focused ? '800' : '600',
+          },
+        ]}
+      >
         {icons[name]}
       </Text>
     </View>

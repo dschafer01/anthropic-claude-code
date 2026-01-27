@@ -57,12 +57,22 @@ const RoundStack = () => {
       <Stack.Screen
         name="BetSetup"
         component={BetSetupScreen}
-        options={{ title: 'Set Up Bets' }}
+        options={{
+          title: 'Set Up Bets',
+          gestureEnabled: true,
+          headerBackVisible: true,
+          headerBackTitle: 'Back',
+        }}
       />
       <Stack.Screen
         name="HandicapSetup"
         component={HandicapSetupScreen}
-        options={{ title: 'Handicap Setup' }}
+        options={{
+          title: 'Handicap Setup',
+          gestureEnabled: true,
+          headerBackVisible: true,
+          headerBackTitle: 'Back',
+        }}
       />
       <Stack.Screen
         name="LiveScorecard"
