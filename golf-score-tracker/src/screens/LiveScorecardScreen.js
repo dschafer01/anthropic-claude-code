@@ -42,6 +42,9 @@ const LiveScorecardScreen = ({ navigation, route }) => {
   const [moneyPop, setMoneyPop] = useState({ visible: false, amount: 0, positive: true });
   const [roundId] = useState(generateId());
   const [showSideBets, setShowSideBets] = useState(false);
+  const [holePars, setHolePars] = useState(() => {
+    return Array.from({ length: numHoles }, (_, i) => course?.holes?.[i]?.par || 4);
+  });
   const [sideBetsPerHole, setSideBetsPerHole] = useState(() => {
     const initial = {};
     for (let i = 0; i < numHoles; i++) {
@@ -57,13 +60,23 @@ const LiveScorecardScreen = ({ navigation, route }) => {
     getSettings().then(setSettings);
   }, []);
 
+  const getCourseWithPars = () => {
+    const holes = Array.from({ length: numHoles }, (_, i) => ({
+      ...(course?.holes?.[i] || { yardage: {}, handicap: i + 1 }),
+      par: holePars[i],
+      number: i + 1,
+    }));
+    return { ...course, holes };
+  };
+
   // Calculate live bank whenever scores change
   useEffect(() => {
     if (bets.length > 0) {
+      const courseWithPars = getCourseWithPars();
       const round = {
         scores,
         bets,
-        course,
+        course: courseWithPars,
         numHoles,
       };
       const newLiveBank = calculateLiveBank(round, players, currentHole);
@@ -94,10 +107,19 @@ const LiveScorecardScreen = ({ navigation, route }) => {
       prevLiveBank.current = newLiveBank;
       setLiveBank(newLiveBank);
     }
-  }, [scores, currentHole, bets, players]);
+  }, [scores, currentHole, bets, players, holePars]);
 
   const getCurrentHoleData = () => {
-    return course?.holes?.[currentHole - 1] || { par: 4, yardage: {}, handicap: currentHole };
+    const hole = course?.holes?.[currentHole - 1] || { yardage: {}, handicap: currentHole };
+    return { ...hole, par: holePars[currentHole - 1] };
+  };
+
+  const updateHolePar = (par) => {
+    setHolePars((prev) => {
+      const newPars = [...prev];
+      newPars[currentHole - 1] = par;
+      return newPars;
+    });
   };
 
   const updateScore = (playerId, score) => {
@@ -121,8 +143,7 @@ const LiveScorecardScreen = ({ navigation, route }) => {
   };
 
   const getApplicableSideBets = (holeIndex) => {
-    const hole = course?.holes?.[holeIndex];
-    const par = hole?.par || 4;
+    const par = holePars[holeIndex] || 4;
     return Object.entries(sideBetConfig).filter(([, config]) => {
       if (config.applicableHoles === 'all') return true;
       if (config.applicableHoles === 'par3' && par === 3) return true;
@@ -174,11 +195,12 @@ const LiveScorecardScreen = ({ navigation, route }) => {
   const completeRound = async () => {
     try {
       // Calculate final money results
+      const courseWithPars = getCourseWithPars();
       const round = {
         id: roundId,
         scores,
         bets,
-        course,
+        course: courseWithPars,
         numHoles,
       };
       const moneyResults = {};
@@ -195,9 +217,10 @@ const LiveScorecardScreen = ({ navigation, route }) => {
         id: roundId,
         date: new Date().toISOString(),
         courseId: course.id,
-        course: course,
+        course: courseWithPars,
         players: players.map((p) => p.id),
         scores,
+        holePars,
         teeBox,
         bets,
         moneyResults,
@@ -287,6 +310,32 @@ const LiveScorecardScreen = ({ navigation, route }) => {
             ›
           </Text>
         </TouchableOpacity>
+      </View>
+
+      {/* Par Selector */}
+      <View style={styles.parSelector}>
+        <Text style={styles.parSelectorLabel}>Par</Text>
+        <View style={styles.parButtons}>
+          {[3, 4, 5].map((par) => (
+            <TouchableOpacity
+              key={par}
+              style={[
+                styles.parButton,
+                holePars[currentHole - 1] === par && styles.parButtonActive,
+              ]}
+              onPress={() => updateHolePar(par)}
+            >
+              <Text
+                style={[
+                  styles.parButtonText,
+                  holePars[currentHole - 1] === par && styles.parButtonTextActive,
+                ]}
+              >
+                {par}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
       {/* Live Bank (if betting) */}
@@ -559,6 +608,44 @@ const styles = StyleSheet.create({
   holeInfo: {
     flex: 1,
     marginHorizontal: 10,
+  },
+  parSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+  },
+  parSelectorLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    marginRight: 12,
+  },
+  parButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  parButton: {
+    width: 44,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  parButtonActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  parButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  parButtonTextActive: {
+    color: colors.white,
   },
   liveBankSection: {
     backgroundColor: colors.dark,
