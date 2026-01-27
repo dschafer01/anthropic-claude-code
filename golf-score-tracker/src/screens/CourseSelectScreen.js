@@ -97,7 +97,7 @@ const CourseSelectScreen = ({ navigation, route }) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyIcon}>⛳️</Text>
+      <Text style={styles.emptyIcon}>No Courses</Text>
       <Text style={styles.emptyTitle}>
         {searchQuery ? 'No courses found' : 'No courses yet'}
       </Text>
@@ -155,10 +155,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   searchInput: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.cardBorder,
-    borderRadius: 12,
+    borderRadius: 8,
     padding: 14,
     fontSize: 16,
     color: colors.text,
@@ -173,7 +173,9 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyIcon: {
-    fontSize: 60,
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.textSecondary,
     marginBottom: 16,
   },
   emptyTitle: {

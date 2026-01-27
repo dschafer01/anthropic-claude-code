@@ -49,9 +49,9 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     padding: 14,
-    borderRadius: 16,
+    borderRadius: 8,
     marginBottom: 10,
     borderWidth: 1,
     borderColor: colors.cardBorder,

@@ -17,15 +17,15 @@ export const colors = {
 
   // Neutrals
   white: '#FFFFFF',
-  background: '#F8F9FA',
-  card: '#FFFFFF',
-  cardBorder: '#E8EAED',
-  text: '#1E2124',
-  textSecondary: '#7A7E83',
+  background: '#FFFFFF',
+  card: '#F7F7F7',
+  cardBorder: '#E5E5E5',
+  text: '#000000',
+  textSecondary: '#6E7079',
   textMuted: '#B0B3B8',
 
   // Dark backgrounds
-  dark: '#1E2124',
+  dark: '#1E1E1E',
   darkCard: '#374151',
 
   // Tee colors

@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   emptySection: {
     backgroundColor: colors.card,
     padding: 24,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: 'center',
   },
   emptyText: {
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   teeBox: {
     flex: 1,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',

@@ -57,8 +57,9 @@ const HomeScreen = ({ navigation }) => {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
-      month: 'short',
+      month: 'long',
       day: 'numeric',
+      year: 'numeric',
     });
   };
 
@@ -92,7 +93,7 @@ const HomeScreen = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.greeting}>
-            {currentUser ? `Welcome, ${currentUser.name}` : 'Golf Score Tracker'}
+            {currentUser ? `Welcome back, ${currentUser.name}` : 'Golf Score Tracker'}
           </Text>
         </View>
 
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   greeting: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700',
     color: colors.text,
   },
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.card,
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },

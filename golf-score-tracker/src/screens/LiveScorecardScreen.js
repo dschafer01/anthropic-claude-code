@@ -564,7 +564,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark,
     marginHorizontal: 16,
     marginBottom: 16,
-    borderRadius: 14,
+    borderRadius: 8,
     padding: 14,
   },
   liveBankHeader: {
@@ -616,15 +616,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   playerScoreCard: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
+    backgroundColor: colors.card,
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   playerScoreHeader: {
     flexDirection: 'row',
@@ -743,8 +740,8 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: colors.background,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     maxHeight: '70%',
   },
   modalHeader: {
@@ -776,7 +773,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.card,
     padding: 14,
-    borderRadius: 16,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },

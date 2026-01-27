@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
+    borderRadius: 8,
   },
   buttonPrimary: {
     backgroundColor: colors.primary,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   buttonLarge: {
     paddingHorizontal: 28,
     paddingVertical: 18,
-    borderRadius: 14,
+    borderRadius: 8,
   },
   text: {
     fontWeight: '600',

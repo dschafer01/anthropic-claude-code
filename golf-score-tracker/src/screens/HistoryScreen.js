@@ -11,7 +11,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../constants/colors';
 import { getRounds, getPlayers, getCurrentUser } from '../utils/storage';
-import { formatRelativeToPar, calculateMonthlyPL, calculateScoringStats } from '../utils/statisticsCalculators';
+import { formatRelativeToPar, calculateMonthlyPL, calculateScoringStats, calculatePlayerStats } from '../utils/statisticsCalculators';
 import MoneyBadge from '../components/MoneyBadge';
 
 const HistoryScreen = ({ navigation }) => {
@@ -23,6 +23,7 @@ const HistoryScreen = ({ navigation }) => {
   const [bankBalance, setBankBalance] = useState(0);
   const [monthlyPL, setMonthlyPL] = useState([]);
   const [scoringStats, setScoringStats] = useState({ birdies: 0, eagles: 0, holeInOnes: 0 });
+  const [playerStats, setPlayerStats] = useState({ totalRounds: 0, averageScore: null, bestScore: null, worstScore: null });
 
   const loadData = async () => {
     try {
@@ -50,6 +51,9 @@ const HistoryScreen = ({ navigation }) => {
 
         const stats = calculateScoringStats(allRounds, user.id);
         setScoringStats(stats);
+
+        const pStats = calculatePlayerStats(allRounds, user.id);
+        setPlayerStats(pStats);
       }
     } catch (error) {
       console.error('Error loading history:', error);
@@ -232,6 +236,31 @@ const HistoryScreen = ({ navigation }) => {
         </View>
       )}
 
+      {/* Extended Stats */}
+      {currentUser && (
+        <View style={styles.extendedStatsSection}>
+          <Text style={styles.plTitle}>Notable Stats</Text>
+          <View style={styles.extendedStatsCard}>
+            <View style={styles.extendedStatRow}>
+              <Text style={styles.extendedStatLabel}>Total Rounds</Text>
+              <Text style={styles.extendedStatValue}>{playerStats.totalRounds}</Text>
+            </View>
+            <View style={styles.extendedStatRow}>
+              <Text style={styles.extendedStatLabel}>Average Score</Text>
+              <Text style={styles.extendedStatValue}>{playerStats.averageScore ?? '-'}</Text>
+            </View>
+            <View style={styles.extendedStatRow}>
+              <Text style={styles.extendedStatLabel}>Best Round</Text>
+              <Text style={styles.extendedStatValue}>{playerStats.bestScore ?? '-'}</Text>
+            </View>
+            <View style={styles.extendedStatRow}>
+              <Text style={styles.extendedStatLabel}>Worst Round</Text>
+              <Text style={styles.extendedStatValue}>{playerStats.worstScore ?? '-'}</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
       {/* Filter header */}
       <View style={styles.filterHeader}>
         <Text style={styles.subtitle}>
@@ -301,7 +330,7 @@ const styles = StyleSheet.create({
   },
   bankCard: {
     backgroundColor: colors.dark,
-    borderRadius: 16,
+    borderRadius: 8,
     padding: 24,
     marginBottom: 16,
     alignItems: 'center',
@@ -337,7 +366,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     backgroundColor: colors.card,
-    borderRadius: 16,
+    borderRadius: 8,
     padding: 16,
     borderWidth: 1,
     borderColor: colors.cardBorder,
@@ -378,7 +407,7 @@ const styles = StyleSheet.create({
   scoringStatCard: {
     flex: 1,
     backgroundColor: colors.card,
-    borderRadius: 16,
+    borderRadius: 8,
     padding: 14,
     alignItems: 'center',
     borderWidth: 1,
@@ -410,7 +439,7 @@ const styles = StyleSheet.create({
   filterButton: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 8,
     backgroundColor: colors.card,
   },
   filterButtonActive: {
@@ -429,7 +458,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.card,
     padding: 14,
-    borderRadius: 16,
+    borderRadius: 8,
     marginBottom: 10,
     borderWidth: 1,
     borderColor: colors.cardBorder,
@@ -502,6 +531,33 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: 40,
+  },
+  extendedStatsSection: {
+    marginBottom: 16,
+  },
+  extendedStatsCard: {
+    backgroundColor: colors.card,
+    borderRadius: 8,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  extendedStatRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.cardBorder,
+  },
+  extendedStatLabel: {
+    fontSize: 15,
+    color: colors.textSecondary,
+  },
+  extendedStatValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
   },
 });
 

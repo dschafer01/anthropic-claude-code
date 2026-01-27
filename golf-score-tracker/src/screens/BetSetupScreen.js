@@ -354,9 +354,9 @@ const styles = StyleSheet.create({
   moneyToggle: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },
@@ -374,9 +374,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   betConfig: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.dark,
     padding: 20,
-    borderRadius: 16,
+    borderRadius: 8,
   },
   totalLabel: {
     fontSize: 16,

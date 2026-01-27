@@ -46,7 +46,7 @@ const CourseCard = ({
 
         {course.location && (
           <Text style={styles.location} numberOfLines={1}>
-            📍 {course.location}
+            {course.location}
           </Text>
         )}
 
@@ -95,17 +95,12 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: colors.cardBorder,
     marginBottom: 10,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   selected: {
     borderColor: colors.primary,

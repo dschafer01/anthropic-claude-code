@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { TouchableOpacity, Text } from 'react-native';
 import { colors } from '../constants/colors';
 
 import RoundSetupScreen from '../screens/RoundSetupScreen';
@@ -33,11 +34,15 @@ const RoundStack = () => {
       <Stack.Screen
         name="RoundSetup"
         component={RoundSetupScreen}
-        options={{
+        options={({ navigation }) => ({
           title: 'New Round',
-          headerBackTitle: 'Cancel',
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.getParent()?.navigate('Home')}>
+              <Text style={{ fontSize: 16, color: colors.text }}>Back</Text>
+            </TouchableOpacity>
+          ),
           gestureEnabled: true,
-        }}
+        })}
       />
       <Stack.Screen
         name="CourseSelect"

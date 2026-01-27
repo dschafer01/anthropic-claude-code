@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.primary,
-    borderRadius: 16,
+    borderRadius: 8,
     padding: 16,
   },
   holeNumber: {
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white + '20',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   holeLabel: {
     fontSize: 10,
