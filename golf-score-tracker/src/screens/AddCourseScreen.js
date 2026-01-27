@@ -220,31 +220,6 @@ const AddCourseScreen = ({ navigation, route }) => {
 
               <View style={styles.holeFields}>
                 <View style={styles.holeField}>
-                  <Text style={styles.holeLabel}>Par</Text>
-                  <View style={styles.parButtons}>
-                    {[3, 4, 5].map((par) => (
-                      <TouchableOpacity
-                        key={par}
-                        style={[
-                          styles.parButton,
-                          hole.par === par && styles.parButtonActive,
-                        ]}
-                        onPress={() => updateHole(index, 'par', par)}
-                      >
-                        <Text
-                          style={[
-                            styles.parButtonText,
-                            hole.par === par && styles.parButtonTextActive,
-                          ]}
-                        >
-                          {par}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                <View style={styles.holeField}>
                   <Text style={styles.holeLabel}>Yards (White)</Text>
                   <TextInput
                     style={styles.holeInput}
@@ -381,28 +356,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.textMuted,
     marginBottom: 6,
-  },
-  parButtons: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  parButton: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: colors.card,
-    alignItems: 'center',
-  },
-  parButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  parButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  parButtonTextActive: {
-    color: colors.white,
   },
   holeInput: {
     backgroundColor: colors.card,
