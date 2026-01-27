@@ -226,7 +226,6 @@ const HeadToHeadScreen = ({ navigation, route }) => {
       <View style={styles.challengeSection}>
         <Button
           title={`Challenge ${opponent.name}`}
-          icon="🎯"
           onPress={handleChallenge}
           size="large"
         />
@@ -296,7 +295,7 @@ const styles = StyleSheet.create({
   },
   moneyCard: {
     backgroundColor: colors.dark,
-    borderRadius: 16,
+    borderRadius: 8,
     padding: 24,
     alignItems: 'center',
     marginBottom: 24,
@@ -340,8 +339,8 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: colors.white,
-    borderRadius: 12,
+    backgroundColor: colors.card,
+    borderRadius: 8,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
@@ -360,9 +359,9 @@ const styles = StyleSheet.create({
   matchCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 8,
     marginBottom: 10,
     borderWidth: 1,
     borderColor: colors.cardBorder,

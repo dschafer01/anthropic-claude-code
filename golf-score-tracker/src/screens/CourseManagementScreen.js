@@ -84,7 +84,7 @@ const CourseManagementScreen = ({ navigation }) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyIcon}>⛳️</Text>
+      <Text style={styles.emptyIcon}>No Courses</Text>
       <Text style={styles.emptyTitle}>No courses yet</Text>
       <Text style={styles.emptyText}>
         Add your favorite courses to get started
@@ -136,7 +136,9 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyIcon: {
-    fontSize: 60,
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.textSecondary,
     marginBottom: 16,
   },
   emptyTitle: {

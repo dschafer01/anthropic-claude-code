@@ -267,7 +267,6 @@ const RoundDetailsScreen = ({ navigation, route }) => {
       <View style={styles.actions}>
         <Button
           title="Share Round"
-          icon="📤"
           variant="outline"
           onPress={handleShare}
           style={styles.actionButton}

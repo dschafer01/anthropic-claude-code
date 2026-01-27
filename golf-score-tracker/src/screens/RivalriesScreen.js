@@ -122,7 +122,6 @@ const RivalriesScreen = ({ navigation }) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyIcon}>🔥</Text>
       <Text style={styles.emptyTitle}>No rivalries yet</Text>
       <Text style={styles.emptyText}>
         Play rounds with other players to build rivalries
@@ -185,10 +184,6 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     paddingVertical: 60,
-  },
-  emptyIcon: {
-    fontSize: 60,
-    marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 20,

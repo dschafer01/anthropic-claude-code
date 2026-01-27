@@ -11,7 +11,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../constants/colors';
 import { getRounds, getPlayers, getCurrentUser } from '../utils/storage';
-import { formatRelativeToPar } from '../utils/statisticsCalculators';
+import { formatRelativeToPar, calculateMonthlyPL, calculateScoringStats, calculatePlayerStats } from '../utils/statisticsCalculators';
 import MoneyBadge from '../components/MoneyBadge';
 
 const HistoryScreen = ({ navigation }) => {
@@ -20,6 +20,10 @@ const HistoryScreen = ({ navigation }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [filter, setFilter] = useState('all'); // all, won, lost
   const [loading, setLoading] = useState(true);
+  const [bankBalance, setBankBalance] = useState(0);
+  const [monthlyPL, setMonthlyPL] = useState([]);
+  const [scoringStats, setScoringStats] = useState({ birdies: 0, eagles: 0, holeInOnes: 0 });
+  const [playerStats, setPlayerStats] = useState({ totalRounds: 0, averageScore: null, bestScore: null, worstScore: null });
 
   const loadData = async () => {
     try {
@@ -37,6 +41,20 @@ const HistoryScreen = ({ navigation }) => {
       setRounds(sortedRounds);
       setPlayers(allPlayers);
       setCurrentUser(user);
+
+      if (user) {
+        const userPlayer = allPlayers.find((p) => p.id === user.id);
+        setBankBalance(userPlayer?.totalBankBalance || 0);
+
+        const monthly = calculateMonthlyPL(allRounds, user.id, 6);
+        setMonthlyPL(monthly);
+
+        const stats = calculateScoringStats(allRounds, user.id);
+        setScoringStats(stats);
+
+        const pStats = calculatePlayerStats(allRounds, user.id);
+        setPlayerStats(pStats);
+      }
     } catch (error) {
       console.error('Error loading history:', error);
     } finally {
@@ -81,6 +99,8 @@ const HistoryScreen = ({ navigation }) => {
 
     return { total, relativeToPar };
   };
+
+  const maxPLValue = Math.max(...monthlyPL.map((m) => Math.abs(m.amount)), 1);
 
   const renderRound = ({ item: round }) => {
     const userMoney = currentUser
@@ -144,42 +164,140 @@ const HistoryScreen = ({ navigation }) => {
   };
 
   const renderHeader = () => (
-    <View style={styles.header}>
-      <Text style={styles.subtitle}>
-        {getFilteredRounds().length} round
-        {getFilteredRounds().length !== 1 ? 's' : ''}
-      </Text>
-      <View style={styles.filterButtons}>
-        {[
-          { key: 'all', label: 'All' },
-          { key: 'won', label: 'Won $' },
-          { key: 'lost', label: 'Lost $' },
-        ].map((f) => (
-          <TouchableOpacity
-            key={f.key}
-            style={[
-              styles.filterButton,
-              filter === f.key && styles.filterButtonActive,
-            ]}
-            onPress={() => setFilter(f.key)}
-          >
+    <View>
+      {/* Bank Balance Card */}
+      {currentUser && (
+        <View style={styles.bankCard}>
+          <Text style={styles.bankLabel}>YOUR BANK</Text>
+          <View style={styles.bankRow}>
             <Text
               style={[
-                styles.filterButtonText,
-                filter === f.key && styles.filterButtonTextActive,
+                styles.bankAmount,
+                { color: bankBalance >= 0 ? colors.moneyPositive : colors.moneyNegative },
               ]}
             >
-              {f.label}
+              {bankBalance >= 0 ? '+' : '-'}${Math.abs(bankBalance).toFixed(2)}
             </Text>
-          </TouchableOpacity>
-        ))}
+          </View>
+          <Text style={styles.bankSubtext}>Lifetime Balance</Text>
+        </View>
+      )}
+
+      {/* Monthly P&L Chart */}
+      {monthlyPL.length > 0 && currentUser && (
+        <View style={styles.plSection}>
+          <Text style={styles.plTitle}>Monthly P&L</Text>
+          <View style={styles.chartContainer}>
+            <View style={styles.chart}>
+              {monthlyPL.map((month, index) => (
+                <View key={index} style={styles.chartBar}>
+                  <View style={styles.barContainer}>
+                    {month.amount !== 0 && (
+                      <View
+                        style={[
+                          styles.bar,
+                          {
+                            height: `${(Math.abs(month.amount) / maxPLValue) * 100}%`,
+                            backgroundColor:
+                              month.amount >= 0
+                                ? colors.moneyPositive
+                                : colors.moneyNegative,
+                            alignSelf: month.amount >= 0 ? 'flex-end' : 'flex-start',
+                          },
+                        ]}
+                      />
+                    )}
+                  </View>
+                  <Text style={styles.barLabel}>{month.month}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* Scoring Stats */}
+      {currentUser && (
+        <View style={styles.scoringStatsSection}>
+          <View style={styles.scoringStatsRow}>
+            <View style={styles.scoringStatCard}>
+              <Text style={styles.scoringStatValue}>{scoringStats.birdies}</Text>
+              <Text style={styles.scoringStatLabel}>Birdies</Text>
+            </View>
+            <View style={styles.scoringStatCard}>
+              <Text style={styles.scoringStatValue}>{scoringStats.eagles}</Text>
+              <Text style={styles.scoringStatLabel}>Eagles</Text>
+            </View>
+            <View style={styles.scoringStatCard}>
+              <Text style={styles.scoringStatValue}>{scoringStats.holeInOnes}</Text>
+              <Text style={styles.scoringStatLabel}>Hole-in-1s</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* Extended Stats */}
+      {currentUser && (
+        <View style={styles.extendedStatsSection}>
+          <Text style={styles.plTitle}>Notable Stats</Text>
+          <View style={styles.extendedStatsCard}>
+            <View style={styles.extendedStatRow}>
+              <Text style={styles.extendedStatLabel}>Total Rounds</Text>
+              <Text style={styles.extendedStatValue}>{playerStats.totalRounds}</Text>
+            </View>
+            <View style={styles.extendedStatRow}>
+              <Text style={styles.extendedStatLabel}>Average Score</Text>
+              <Text style={styles.extendedStatValue}>{playerStats.averageScore ?? '-'}</Text>
+            </View>
+            <View style={styles.extendedStatRow}>
+              <Text style={styles.extendedStatLabel}>Best Round</Text>
+              <Text style={styles.extendedStatValue}>{playerStats.bestScore ?? '-'}</Text>
+            </View>
+            <View style={styles.extendedStatRow}>
+              <Text style={styles.extendedStatLabel}>Worst Round</Text>
+              <Text style={styles.extendedStatValue}>{playerStats.worstScore ?? '-'}</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* Filter header */}
+      <View style={styles.filterHeader}>
+        <Text style={styles.subtitle}>
+          {getFilteredRounds().length} round
+          {getFilteredRounds().length !== 1 ? 's' : ''}
+        </Text>
+        <View style={styles.filterButtons}>
+          {[
+            { key: 'all', label: 'All' },
+            { key: 'won', label: 'Won $' },
+            { key: 'lost', label: 'Lost $' },
+          ].map((f) => (
+            <TouchableOpacity
+              key={f.key}
+              style={[
+                styles.filterButton,
+                filter === f.key && styles.filterButtonActive,
+              ]}
+              onPress={() => setFilter(f.key)}
+            >
+              <Text
+                style={[
+                  styles.filterButtonText,
+                  filter === f.key && styles.filterButtonTextActive,
+                ]}
+              >
+                {f.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
     </View>
   );
 
   const renderEmpty = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyIcon}>📋</Text>
       <Text style={styles.emptyTitle}>No rounds yet</Text>
       <Text style={styles.emptyText}>
         Complete your first round to see it here
@@ -194,7 +312,7 @@ const HistoryScreen = ({ navigation }) => {
         renderItem={renderRound}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
-        ListHeaderComponent={rounds.length > 0 ? renderHeader : null}
+        ListHeaderComponent={renderHeader}
         ListEmptyComponent={!loading ? renderEmpty : null}
         showsVerticalScrollIndicator={false}
       />
@@ -210,7 +328,103 @@ const styles = StyleSheet.create({
   list: {
     padding: 16,
   },
-  header: {
+  bankCard: {
+    backgroundColor: colors.dark,
+    borderRadius: 8,
+    padding: 24,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  bankLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.white + '80',
+    letterSpacing: 2,
+    marginBottom: 8,
+  },
+  bankRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bankAmount: {
+    fontSize: 48,
+    fontWeight: '800',
+  },
+  bankSubtext: {
+    fontSize: 14,
+    color: colors.white + '60',
+    marginTop: 8,
+  },
+  plSection: {
+    marginBottom: 16,
+  },
+  plTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 14,
+  },
+  chartContainer: {
+    backgroundColor: colors.card,
+    borderRadius: 8,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  chart: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    height: 120,
+  },
+  chartBar: {
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  barContainer: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+  },
+  bar: {
+    width: '100%',
+    borderRadius: 4,
+    minHeight: 4,
+  },
+  barLabel: {
+    fontSize: 11,
+    color: colors.textMuted,
+    marginTop: 8,
+  },
+  scoringStatsSection: {
+    marginBottom: 16,
+  },
+  scoringStatsRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  scoringStatCard: {
+    flex: 1,
+    backgroundColor: colors.card,
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  scoringStatValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  scoringStatLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  filterHeader: {
     marginBottom: 16,
   },
   subtitle: {
@@ -225,7 +439,7 @@ const styles = StyleSheet.create({
   filterButton: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 8,
     backgroundColor: colors.card,
   },
   filterButtonActive: {
@@ -242,20 +456,17 @@ const styles = StyleSheet.create({
   roundCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 8,
     marginBottom: 10,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   roundDate: {
     alignItems: 'center',
     marginRight: 14,
-    backgroundColor: colors.card,
+    backgroundColor: colors.background,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
@@ -309,10 +520,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 60,
   },
-  emptyIcon: {
-    fontSize: 60,
-    marginBottom: 16,
-  },
   emptyTitle: {
     fontSize: 20,
     fontWeight: '700',
@@ -324,6 +531,33 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: 40,
+  },
+  extendedStatsSection: {
+    marginBottom: 16,
+  },
+  extendedStatsCard: {
+    backgroundColor: colors.card,
+    borderRadius: 8,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  extendedStatRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.cardBorder,
+  },
+  extendedStatLabel: {
+    fontSize: 15,
+    color: colors.textSecondary,
+  },
+  extendedStatValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
   },
 });
 

@@ -110,7 +110,7 @@ const GHINSetupScreen = ({ navigation }) => {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Info Card */}
       <View style={styles.infoCard}>
-        <Text style={styles.infoIcon}>ℹ️</Text>
+        <Text style={styles.infoIcon}>i</Text>
         <Text style={styles.infoText}>
           Enter your GHIN number and handicap index to enable net scoring in your rounds.
           For now, you'll need to manually update your handicap when it changes.
@@ -227,12 +227,20 @@ const styles = StyleSheet.create({
   infoCard: {
     flexDirection: 'row',
     backgroundColor: colors.info + '15',
-    borderRadius: 12,
+    borderRadius: 8,
     padding: 14,
     marginBottom: 24,
   },
   infoIcon: {
-    fontSize: 20,
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.info,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.info + '20',
+    textAlign: 'center',
+    lineHeight: 24,
     marginRight: 10,
   },
   infoText: {
@@ -243,7 +251,7 @@ const styles = StyleSheet.create({
   },
   currentHandicap: {
     backgroundColor: colors.primary,
-    borderRadius: 16,
+    borderRadius: 8,
     padding: 24,
     alignItems: 'center',
     marginBottom: 24,
@@ -278,10 +286,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.cardBorder,
-    borderRadius: 12,
+    borderRadius: 8,
     padding: 14,
     fontSize: 16,
     color: colors.text,
@@ -291,8 +299,8 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   explainerCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
+    backgroundColor: colors.card,
+    borderRadius: 8,
     padding: 16,
     borderWidth: 1,
     borderColor: colors.cardBorder,

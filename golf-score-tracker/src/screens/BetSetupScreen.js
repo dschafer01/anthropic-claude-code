@@ -11,7 +11,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { colors } from '../constants/colors';
-import { BET_TYPES, betTypeConfig, SIDE_BET_TYPES, sideBetConfig } from '../constants/betTypes';
+import { BET_TYPES, betTypeConfig } from '../constants/betTypes';
 import BetTypeSelector from '../components/BetTypeSelector';
 import Button from '../components/Button';
 
@@ -70,13 +70,6 @@ const BetSetupScreen = ({ navigation, route }) => {
         break;
     }
 
-    // Add side bets
-    Object.values(sideBets).forEach((bet) => {
-      if (bet?.enabled) {
-        total += bet.amount * 5; // Estimate 5 opportunities
-      }
-    });
-
     return total;
   };
 
@@ -116,16 +109,6 @@ const BetSetupScreen = ({ navigation, route }) => {
           break;
       }
 
-      // Add side bets
-      Object.entries(sideBets).forEach(([type, bet]) => {
-        if (bet?.enabled) {
-          bets.push({
-            type,
-            amount: bet.amount,
-            isSideBet: true,
-          });
-        }
-      });
     }
 
     // Check if any player has a handicap
@@ -326,38 +309,6 @@ const BetSetupScreen = ({ navigation, route }) => {
             {/* Bet Configuration */}
             <View style={styles.section}>{renderBetConfig()}</View>
 
-            {/* Side Bets */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Side Bets (Optional)</Text>
-              {Object.entries(sideBetConfig).map(([type, config]) => (
-                <TouchableOpacity
-                  key={type}
-                  style={[
-                    styles.sideBetOption,
-                    sideBets[type]?.enabled && styles.sideBetOptionActive,
-                  ]}
-                  onPress={() => toggleSideBet(type)}
-                >
-                  <Text style={styles.sideBetIcon}>{config.icon}</Text>
-                  <View style={styles.sideBetInfo}>
-                    <Text style={styles.sideBetName}>{config.name}</Text>
-                    <Text style={styles.sideBetDesc}>{config.description}</Text>
-                  </View>
-                  {sideBets[type]?.enabled && (
-                    <View style={styles.sideBetAmount}>
-                      <Text style={styles.dollarSign}>$</Text>
-                      <TextInput
-                        style={styles.sideBetInput}
-                        value={sideBets[type]?.amount?.toString() || ''}
-                        onChangeText={(v) => updateSideBetAmount(type, v)}
-                        keyboardType="decimal-pad"
-                      />
-                    </View>
-                  )}
-                </TouchableOpacity>
-              ))}
-            </View>
-
             {/* Total at Risk */}
             <View style={styles.totalSection}>
               <Text style={styles.totalLabel}>Total at Risk</Text>
@@ -403,9 +354,9 @@ const styles = StyleSheet.create({
   moneyToggle: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },
@@ -423,9 +374,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   betConfig: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.card,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },
@@ -544,7 +495,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.dark,
     padding: 20,
-    borderRadius: 16,
+    borderRadius: 8,
   },
   totalLabel: {
     fontSize: 16,

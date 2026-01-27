@@ -76,7 +76,7 @@ const PlayerManagementScreen = ({ navigation }) => {
 
   const renderEmpty = () => (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyIcon}>👥</Text>
+      <Text style={styles.emptyIcon}>No Players</Text>
       <Text style={styles.emptyTitle}>No players yet</Text>
       <Text style={styles.emptyText}>
         Add players to track scores and rivalries
@@ -133,7 +133,9 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyIcon: {
-    fontSize: 60,
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.textSecondary,
     marginBottom: 16,
   },
   emptyTitle: {

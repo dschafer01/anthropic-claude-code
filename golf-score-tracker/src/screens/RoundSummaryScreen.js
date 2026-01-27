@@ -105,9 +105,8 @@ const RoundSummaryScreen = ({ navigation, route }) => {
         {/* Winner Banner (if betting) */}
         {hasBets && bigWinner && (moneyResults[bigWinner.id] || 0) > 0 && (
           <View style={styles.winnerBanner}>
-            <Text style={styles.winnerEmoji}>🏆</Text>
             <Text style={styles.winnerText}>
-              {bigWinner.name} wins ${(moneyResults[bigWinner.id] || 0).toFixed(2)}!
+              {bigWinner.name} wins ${(moneyResults[bigWinner.id] || 0).toFixed(2)}
             </Text>
           </View>
         )}
@@ -123,12 +122,12 @@ const RoundSummaryScreen = ({ navigation, route }) => {
               return (
                 <View key={player.id} style={styles.scorecardRow}>
                   <View style={styles.scorecardPosition}>
-                    {index === 0 && <Text style={styles.positionIcon}>🥇</Text>}
-                    {index === 1 && <Text style={styles.positionIcon}>🥈</Text>}
-                    {index === 2 && <Text style={styles.positionIcon}>🥉</Text>}
-                    {index > 2 && (
-                      <Text style={styles.positionNumber}>{index + 1}</Text>
-                    )}
+                    <Text style={[
+                      styles.positionNumber,
+                      index === 0 && styles.positionFirst,
+                    ]}>
+                      {index === 0 ? '1st' : index === 1 ? '2nd' : index === 2 ? '3rd' : `${index + 1}th`}
+                    </Text>
                   </View>
 
                   <View
@@ -271,12 +270,10 @@ const RoundSummaryScreen = ({ navigation, route }) => {
         {/* Actions */}
         <View style={styles.actions}>
           <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-            <Text style={styles.actionIcon}>📤</Text>
             <Text style={styles.actionText}>Share</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionButton} onPress={handleRematch}>
-            <Text style={styles.actionIcon}>🔄</Text>
             <Text style={styles.actionText}>Rematch</Text>
           </TouchableOpacity>
         </View>
@@ -317,17 +314,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   winnerBanner: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.moneyPositive + '20',
     padding: 16,
-    borderRadius: 14,
+    borderRadius: 8,
     marginBottom: 24,
-  },
-  winnerEmoji: {
-    fontSize: 28,
-    marginRight: 10,
   },
   winnerText: {
     fontSize: 18,
@@ -344,8 +336,8 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   scorecard: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
+    backgroundColor: colors.card,
+    borderRadius: 8,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.cardBorder,
@@ -358,16 +350,17 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.cardBorder,
   },
   scorecardPosition: {
-    width: 30,
+    width: 34,
     alignItems: 'center',
-  },
-  positionIcon: {
-    fontSize: 18,
   },
   positionNumber: {
     fontSize: 16,
     fontWeight: '600',
     color: colors.textMuted,
+  },
+  positionFirst: {
+    color: colors.primary,
+    fontWeight: '700',
   },
   scorecardAvatar: {
     width: 40,
@@ -416,8 +409,8 @@ const styles = StyleSheet.create({
     color: colors.danger,
   },
   moneyBreakdown: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
+    backgroundColor: colors.card,
+    borderRadius: 8,
     padding: 16,
     borderWidth: 1,
     borderColor: colors.cardBorder,
@@ -526,11 +519,12 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     alignItems: 'center',
-    padding: 16,
-  },
-  actionIcon: {
-    fontSize: 28,
-    marginBottom: 6,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   actionText: {
     fontSize: 14,

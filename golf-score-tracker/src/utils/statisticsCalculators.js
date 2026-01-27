@@ -398,6 +398,36 @@ export const formatRelativeToPar = (relativeToPar) => {
   return `${relativeToPar}`;
 };
 
+/**
+ * Calculate scoring stats (birdies, eagles, hole-in-ones)
+ */
+export const calculateScoringStats = (rounds, playerId) => {
+  let birdies = 0;
+  let eagles = 0;
+  let holeInOnes = 0;
+
+  rounds.forEach((round) => {
+    if (!round.isComplete || !round.players.includes(playerId)) return;
+    if (!round.course?.holes) return;
+
+    const scores = round.scores[playerId] || [];
+    scores.forEach((score, index) => {
+      if (!score || !round.course.holes[index]) return;
+      const par = round.course.holes[index].par;
+
+      if (score === 1) {
+        holeInOnes++;
+      } else if (score <= par - 2) {
+        eagles++;
+      } else if (score === par - 1) {
+        birdies++;
+      }
+    });
+  });
+
+  return { birdies, eagles, holeInOnes };
+};
+
 export default {
   calculateRivalry,
   getAllRivalries,
@@ -407,4 +437,5 @@ export default {
   getRoundLeaderboard,
   calculateRelativeToPar,
   formatRelativeToPar,
+  calculateScoringStats,
 };
