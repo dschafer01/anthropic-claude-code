@@ -18,11 +18,13 @@ import Button from '../components/Button';
 
 const AddCourseScreen = ({ navigation, route }) => {
   const editCourse = route.params?.course;
+  const prefillData = route.params?.prefillData;
+  const onCourseSaved = route.params?.onCourseSaved;
   const isEditing = !!editCourse;
 
-  const [name, setName] = useState(editCourse?.name || '');
-  const [location, setLocation] = useState(editCourse?.location || '');
-  const [numHoles, setNumHoles] = useState(editCourse?.holes?.length || 18);
+  const [name, setName] = useState(editCourse?.name || prefillData?.name || '');
+  const [location, setLocation] = useState(editCourse?.location || prefillData?.location || '');
+  const [numHoles, setNumHoles] = useState(editCourse?.holes?.length || prefillData?.holes || 18);
   const [holes, setHoles] = useState(
     editCourse?.holes ||
       Array.from({ length: 18 }, (_, i) => ({
@@ -88,10 +90,20 @@ const AddCourseScreen = ({ navigation, route }) => {
         slopeRating,
         isFavorite: editCourse?.isFavorite || false,
         timesPlayed: editCourse?.timesPlayed || 0,
+        // Include metadata from search results if available
+        ...(prefillData?.coordinates && { coordinates: prefillData.coordinates }),
+        ...(prefillData?.source && { source: prefillData.source }),
+        ...(prefillData?.osmId && { osmId: prefillData.osmId }),
       };
 
       await saveCourse(course);
-      navigation.goBack();
+
+      // Call callback if provided (for search flow)
+      if (onCourseSaved) {
+        onCourseSaved(course);
+      } else {
+        navigation.goBack();
+      }
     } catch (error) {
       console.error('Error saving course:', error);
       Alert.alert('Error', 'Failed to save course');
@@ -110,6 +122,15 @@ const AddCourseScreen = ({ navigation, route }) => {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        {/* Search result note */}
+        {prefillData && (
+          <View style={styles.searchNote}>
+            <Text style={styles.searchNoteText}>
+              Course found via search. Add par and yardage details below.
+            </Text>
+          </View>
+        )}
+
         {/* Basic Info */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Course Info</Text>
@@ -254,7 +275,7 @@ const AddCourseScreen = ({ navigation, route }) => {
 
       <View style={styles.footer}>
         <Button
-          title={isEditing ? 'Save Changes' : 'Add Course'}
+          title={isEditing ? 'Save Changes' : prefillData ? 'Save Course' : 'Add Course'}
           onPress={handleSave}
           loading={saving}
           disabled={!name.trim()}
@@ -275,6 +296,17 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     paddingBottom: 120,
+  },
+  searchNote: {
+    backgroundColor: colors.primary + '15',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  searchNoteText: {
+    fontSize: 14,
+    color: colors.primary,
+    textAlign: 'center',
   },
   section: {
     marginBottom: 24,

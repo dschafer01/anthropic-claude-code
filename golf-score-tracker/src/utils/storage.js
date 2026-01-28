@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   ROUNDS: '@golf_tracker/rounds',
   SETTINGS: '@golf_tracker/settings',
   CURRENT_USER: '@golf_tracker/current_user',
+  COURSE_SEARCH_CACHE: '@golf_tracker/course_search_cache',
 };
 
 // Generic storage helpers
@@ -293,6 +294,33 @@ export const clearAllData = async () => {
   }
 };
 
+// Course search cache operations
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+export const getCourseSearchCache = async () => {
+  const cache = await getItem(STORAGE_KEYS.COURSE_SEARCH_CACHE);
+  return cache || {};
+};
+
+export const setCourseSearchCache = async (cache) => {
+  await setItem(STORAGE_KEYS.COURSE_SEARCH_CACHE, cache);
+};
+
+export const clearExpiredCache = async () => {
+  const cache = await getCourseSearchCache();
+  const now = Date.now();
+  const cleaned = {};
+
+  Object.entries(cache).forEach(([key, value]) => {
+    if (value.expiresAt > now) {
+      cleaned[key] = value;
+    }
+  });
+
+  await setCourseSearchCache(cleaned);
+  return cleaned;
+};
+
 export default {
   STORAGE_KEYS,
   setItem,
@@ -324,4 +352,7 @@ export default {
   exportAllData,
   importData,
   clearAllData,
+  getCourseSearchCache,
+  setCourseSearchCache,
+  clearExpiredCache,
 };
